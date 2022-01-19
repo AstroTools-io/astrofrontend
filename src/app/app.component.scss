@@ -1,0 +1,150 @@
+:host {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app-layout {
+  height: 100vh;
+}
+
+.menu-icon {
+  width: 30px;
+}
+
+.buy-astro {
+  margin-right: 1.5em;
+  white-space: nowrap;
+}
+
+.header-trigger {
+  height: 64px;
+  padding: 0 24px 20px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s, padding 0s;
+}
+
+nz-header {
+  padding: 0;
+  width: 100%;
+  z-index: 2;
+}
+
+nz-content {
+  margin: 12px;
+}
+
+@media only screen and (max-width: 815px) {
+  nz-content {
+    margin: 0 !important;
+  }
+
+  .app-header {
+    height: 32px;
+  }
+}
+
+.metamask-icon {
+  width: 24px;
+  margin-right: 0.5em;
+  margin-bottom: 1px;
+}
+
+.tier {
+  color: rgb(108, 41, 167);
+}
+
+.dark-toggle {
+  margin: auto 2em auto 0;
+}
+
+.btn-metamask {
+  margin-right: 2.2em;
+}
+
+.zerion {
+  margin-left: 0.2em;
+}
+
+.saved-pairs {
+  padding-left: 24px !important;
+  font-size: 12px !important;
+  height: 15px;
+}
+
+.pb {
+  margin: 0 12px;
+  width: 100%;
+
+  a {
+    width: 100%;
+    margin: 0 10px;
+    white-space: nowrap;
+  }
+
+  p {
+    font-size: 14px;
+  }
+}
+
+.scroll-left {
+  position: relative;
+  width: 100%;
+  margin: 0 12px;
+  overflow: hidden;
+
+  a {
+    width: 100%;
+    white-space: nowrap;
+  }
+}
+
+.scroll-left p {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  font-size: 14px;
+  text-align: center;
+  /* Starting position */
+  -moz-transform: translateX(100%);
+  -webkit-transform: translateX(100%);
+  transform: translateX(100%);
+  /* Apply animation to this element */
+  -moz-animation: scroll-left 8s linear infinite;
+  -webkit-animation: scroll-left 8s linear infinite;
+  animation: scroll-left 8s linear infinite;
+}
+
+/* Move it (define the animation) */
+@-moz-keyframes scroll-left {
+  0% {
+    -moz-transform: translateX(100%);
+  }
+  100% {
+    -moz-transform: translateX(-100%);
+  }
+}
+
+@-webkit-keyframes scroll-left {
+  0% {
+    -webkit-transform: translateX(100%);
+  }
+  100% {
+    -webkit-transform: translateX(-100%);
+  }
+}
+
+@keyframes scroll-left {
+  0% {
+    -moz-transform: translateX(100%); /* Browser bug fix */
+    -webkit-transform: translateX(100%); /* Browser bug fix */
+    transform: translateX(100%);
+  }
+  100% {
+    -moz-transform: translateX(-100%); /* Browser bug fix */
+    -webkit-transform: translateX(-100%); /* Browser bug fix */
+    transform: translateX(-100%);
+  }
+}

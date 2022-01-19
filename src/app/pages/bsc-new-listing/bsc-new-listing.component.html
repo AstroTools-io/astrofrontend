@@ -1,0 +1,152 @@
+<nz-table
+  #filterTable
+  [nzData]="newTokens$ | async"
+  [nzPageSize]="50"
+  nzSize="small"
+  nzTableLayout="auto"
+>
+  <thead>
+    <tr>
+      <th
+        *ngFor="let column of listOfColumns"
+        [nzFilterFn]="column.filterFn"
+        [nzFilterMultiple]="column.filterMultiple"
+        [nzFilters]="column.listOfFilter"
+        [nzSortDirections]="column.sortDirections"
+        [nzSortFn]="column.sortFn"
+        [nzSortOrder]="column.sortOrder"
+      >
+        {{ column.name }}
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of filterTable.data; trackBy: identify">
+      <td>
+        {{ data.creationDate | amTimeAgo }}
+      </td>
+      <td>
+        <a
+          [href]="'https://bscscan.com/token/' + data.tokenId"
+          class="actions"
+          target="_blank"
+        >
+          {{ data.tokenName }}
+        </a>
+      </td>
+      <td>
+        {{
+          data.oldHolders && data.oldHolders !== data.holders
+            ? (data.oldHolders | number: "1.0-0") + " → "
+            : ""
+        }}
+        {{ data.holders | number: "1.0-0" }}
+      </td>
+      <td>
+        <a
+          *ngIf="data.officialSite"
+          [href]="sanitizer.bypassSecurityTrustUrl(data.officialSite)"
+          class="coingecko"
+          target="_blank"
+        >
+          <img
+            alt="homepage link"
+            height="20"
+            src="/assets/images/web.png"
+            width="20"
+          />
+        </a>
+        <ng-container *ngFor="let link of data.linksSocial">
+          <a
+            *ngIf="link.type === 'Twitter'"
+            [href]="sanitizer.bypassSecurityTrustUrl(link.link)"
+            class="coingecko"
+            target="_blank"
+          >
+            <img
+              alt="twitter link"
+              height="20"
+              nz-tooltip
+              nzTooltipTitle="Twitter"
+              src="/assets/images/twitter.webp"
+              width="20"
+            />
+          </a>
+          <a
+            *ngIf="link.type === 'Discord'"
+            [href]="sanitizer.bypassSecurityTrustUrl(link.link)"
+            class="coingecko"
+            target="_blank"
+          >
+            <img
+              alt="discord link"
+              height="20"
+              src="/assets/images/discord.png"
+              width="20"
+            />
+          </a>
+          <a
+            *ngIf="link.type === 'Telegram'"
+            [href]="sanitizer.bypassSecurityTrustUrl(link.link)"
+            class="coingecko"
+            nz-tooltip
+            nzTooltipTitle="Telegram"
+            target="_blank"
+          >
+            <img
+              alt="telegram link"
+              height="20"
+              src="/assets/images/telegram.png"
+              width="20"
+            />
+          </a>
+          <a
+            *ngIf="link.type === 'CoinGecko'"
+            [href]="formatLinkCG(link.link, 'CG')"
+            class="coingecko"
+            nz-tooltip
+            nzTooltipTitle="CoinGecko"
+            target="_blank"
+          >
+            <img
+              alt="coingecko link"
+              height="20"
+              src="/assets/images/coingecko.png"
+              width="20"
+            />
+          </a>
+          <a
+            *ngIf="link.type === 'CoinMarketCap'"
+            [href]="formatLinkCG(link.link, 'CMC')"
+            class="coingecko"
+            nz-tooltip
+            nzTooltipTitle="CoinMarketCap"
+            target="_blank"
+          >
+            <img
+              alt="coingecko link"
+              height="20"
+              src="/assets/images/web.png"
+              width="20"
+            />
+          </a>
+          <a
+            *ngIf="link.type === 'Github'"
+            [href]="sanitizer.bypassSecurityTrustUrl(link.link)"
+            class="coingecko"
+            nz-tooltip
+            nzTooltipTitle="GitHub"
+            target="_blank"
+          >
+            <img
+              alt="coingecko link"
+              height="20"
+              src="/assets/images/github.png"
+              width="20"
+            />
+          </a>
+        </ng-container>
+      </td>
+    </tr>
+  </tbody>
+</nz-table>

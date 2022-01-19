@@ -1,0 +1,41 @@
+<section id="wallet">
+  <nz-table
+    #tokenTable
+    [nzData]="etherService.tokenList$ | async"
+    [nzLoading]="etherService.tokenListLoading$ | async"
+    [nzPageSize]="50"
+    nzSize="small"
+    nzTableLayout="auto"
+  >
+    <thead>
+    <tr>
+      <th
+        *ngFor="let column of listOfColumns"
+        [nzFilterFn]="column.filterFn"
+        [nzFilterMultiple]="column.filterMultiple"
+        [nzFilters]="column.listOfFilter"
+        [nzSortDirections]="column.sortDirections"
+        [nzSortFn]="column.sortFn"
+        [nzSortOrder]="column.sortOrder"
+      >
+        {{ column.name }}
+      </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let token of tokenTable.data; trackBy: identify">
+      <td>
+        <div>
+          <span class="symbol highlight">{{ token.symbol }}</span>
+          <span class="token-value">${{ token.price | number: "1.4-4" }}</span>
+        </div>
+        <div>{{ token.name }}</div>
+      </td>
+      <td>
+        <div class="highlight">{{ token.amount }}</div>
+        <div class="token-value">${{ token.price * token.amount | number: "1.2-2" }}</div>
+      </td>
+    </tr>
+    </tbody>
+  </nz-table>
+</section>

@@ -1,0 +1,45 @@
+<nz-select
+  [(ngModel)]="selectedValue"
+  [nzAllowClear]="true"
+  [nzFilterOption]="nzFilterOption"
+  [nzShowArrow]="false"
+  nzShowSearch
+  nzServerSearch
+  nzPlaceHolder="Enter pair id or token name/id/symbol"
+  (nzBlur)="onBlur()"
+  (ngModelChange)="searchSelected()"
+  (nzOnSearch)="search($event)"
+>
+  <ng-container *ngIf="isSearching">
+    <nz-option nzDisabled nzCustomContent>
+      <i nz-icon nzType="loading" class="loading-icon"></i> Loading Data...
+    </nz-option>
+  </ng-container>
+  <ng-container *ngIf="!isSearching">
+    <nz-option
+      *ngFor="let o of listOfOption"
+      [nzLabel]="o.text"
+      [nzValue]="o.value"
+    >
+    </nz-option>
+  </ng-container>
+</nz-select>
+
+<div *ngIf="tokens.length" class="swap-wrapper">
+  <iframe
+    *ngFor="let token of tokens"
+    [id]="token.id"
+    [src]="getUniUrl(token)"
+    height="660px"
+    width="100%"
+    style="
+      max-width: 480px;
+      min-width: 300px;
+      margin: 15px;
+      display: block;
+      border: 0;
+      border-radius: 10px;
+    "
+  >
+  </iframe>
+</div>

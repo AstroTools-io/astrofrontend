@@ -1,0 +1,131 @@
+<div>
+  <form nz-form>
+    <div nz-row class="filer-row">
+      <div nz-col>
+        <nz-form-item>
+          <nz-form-label [nzSpan]="0" nzNoColon nzFor="volume">
+            Min $
+          </nz-form-label>
+          <nz-form-control>
+            <nz-input-number
+              [(ngModel)]="whaleService.whalesDefaultVar.minAmountUSD"
+              (ngModelChange)="refetchWithNewVar()"
+              [nzMin]="1000"
+              [nzStep]="1"
+              name="min USD amount"
+            ></nz-input-number>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+      <div nz-col class="filter-items">
+        <nz-form-item>
+          <input
+            type="text"
+            [(ngModel)]="searchToken"
+            nz-input
+            name="searchToken"
+            placeholder="Filter by Token Name"
+          />
+        </nz-form-item>
+      </div>
+      <div nz-col class="filter-items">
+        <nz-form-item>
+          <button
+            class="search-button"
+            nz-button
+            nzSize="small"
+            nzType="primary"
+            (click)="searchTokenFn()"
+          >
+            Filter
+          </button>
+        </nz-form-item>
+      </div>
+      <div nz-col class="filter-items">
+        <nz-form-item>
+          <button nz-button nzSize="small" (click)="resetTokenSearch()">
+            Reset
+          </button>
+        </nz-form-item>
+      </div>
+    </div>
+  </form>
+</div>
+
+<nz-table
+  #filterTable
+  [nzData]="swaps"
+  [nzPageSize]="50"
+  nzSize="small"
+  nzTableLayout="auto"
+>
+  <thead>
+    <tr>
+      <th
+        *ngFor="let column of listOfColumns; let i = index;"
+        [nzCustomFilter]="i === 1 || i === 5"
+        [nzFilterFn]="column.filterFn"
+        [nzFilterMultiple]="column.filterMultiple"
+        [nzFilters]="column.listOfFilter"
+        [nzSortDirections]="column.sortDirections"
+        [nzSortFn]="column.sortFn"
+        [nzSortOrder]="column.sortOrder"
+      >
+        {{ column.name }}
+        <nz-filter-trigger
+          *ngIf="i === 1"
+          [(nzVisible)]="tokenFilterVisible"
+          [nzActive]="searchToken.length > 0"
+          [nzDropdownMenu]="menu"
+        >
+          <i nz-icon nzType="search"></i>
+        </nz-filter-trigger>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of filterTable.data; trackBy: identify">
+      <td>{{ formatDate(data.timestamp) | date: "yy-MM-dd H:mm:ss" }}</td>
+      <td>{{ data.symbol }}</td>
+      <td [class]="data.type">{{ data.type }}</td>
+      <td>{{ data.amountUSD | currency: "USD":"symbol":"1.0-0" }}</td>
+      <td>{{ data.amountEth | number: "1.2-2" }}</td>
+      <td>
+        <a
+          [href]="'https://etherscan.io/tx/' + data.transaction.id"
+          target="_blank"
+        >
+          Tx
+        </a>
+        |
+        <a [routerLink]="'/pair-explorer/' + data.pair.id" target="_blank">
+          Pair
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</nz-table>
+<nz-dropdown-menu #menu="nzDropdownMenu">
+  <div class="ant-table-filter-dropdown">
+    <div class="search-box">
+      <input
+        type="text"
+        nz-input
+        placeholder="Filter token"
+        [(ngModel)]="searchToken"
+      />
+      <button
+        class="search-button"
+        nz-button
+        nzSize="small"
+        nzType="primary"
+        (click)="searchTokenFn()"
+      >
+        Search
+      </button>
+      <button nz-button nzSize="small" (click)="resetTokenSearch()">
+        Reset
+      </button>
+    </div>
+  </div>
+</nz-dropdown-menu>

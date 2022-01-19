@@ -1,0 +1,291 @@
+<section id="header" [style.display]="pairInfo ? 'flex' : 'none'">
+  <app-token-info
+    *ngIf="listOfData && listOfData[0]"
+    [dailyVolume]="dailyVolume"
+    [ethPrice]="ethPrice"
+    [geckoInfo]="geckoInfo"
+    [pairInfo]="pairInfo"
+    [pairUnit]="pairUnit.symbol !== 'WETH' ? pairUnit.symbol : 'ETH'"
+    [token]="token"
+    [tokenInfo]="listOfData[0]"
+    [tokenIsFirstInPair]="tokenIsFirstInPair"
+    (openDrawer)="open($event)"
+  ></app-token-info>
+
+  <div id="chart-right">
+    <div id="chart-header">
+      <section *ngIf="currentFav" class="price-options">
+        <div class="my-entry">
+          <!--<label>My Entry: </label>-->
+          <input
+            [(ngModel)]="currentFav.myEntry"
+            nz-input
+            placeholder="price"
+          />
+          <a nz-button nzType="primary" (click)="saveMyEntry()">Set My Entry</a>
+        </div>
+        <div class="price-alert">
+          <!--<label>Price Alert: </label>-->
+          <input
+            #pAlert
+            [value]="currentFav.priceUSD ? currentFav.priceUSD.toFixed(6) : 0"
+            nz-input
+            placeholder="Price alert"
+          />
+          <a (click)="savePriceAlert(pAlert.value)" nz-button nzType="primary">
+            Set Alert Price
+          </a>
+          <div class="alerts">
+            <span *ngIf="currentFav.higherSavedPrice">
+              <label>Alert >= </label>${{ currentFav.higherSavedPrice }}
+            </span>
+            <span *ngIf="currentFav.lowerSavedPrice">
+              <label>Alert <= </label>${{ currentFav.lowerSavedPrice }}
+            </span>
+          </div>
+          <a
+            *ngIf="currentFav.higherSavedPrice || currentFav.lowerSavedPrice"
+            (click)="clearAlerts()"
+            nz-button
+            nzType="primary"
+          >
+            Clear Alerts
+          </a>
+        </div>
+      </section>
+    </div>
+
+    <div id="chart"></div>
+
+    <app-tv-chart
+      *ngIf="isInitiated"
+      [datafeed]="datafeed"
+      [interval]="'15'"
+    ></app-tv-chart>
+  </div>
+</section>
+
+<!-- <ng-container *ngIf="showMyTrades && token">
+  <app-address-trades
+    [address]="etherService.account"
+    [symbol]="token.symbol"
+  ></app-address-trades>
+</ng-container> -->
+
+<button class="trade-history" nz-button nzType="primary">Trade History</button>
+
+<button
+  *ngIf="listOfData && listOfData[0] && etherService.connectedAddress"
+  (click)="openMyTradesDrawer()"
+  nz-button
+  nzType="primary"
+>
+  My Trades
+</button>
+
+<nz-table
+  #filterTable
+  [nzData]="listOfDisplayData"
+  [nzLoading]="!listOfDisplayData || listOfDisplayData.length === 0"
+  [nzPageSize]="50"
+  nzSize="small"
+  nzTableLayout="auto"
+>
+  <thead>
+    <tr>
+      <th
+        *ngFor="let column of listOfColumns; let i = index"
+        [nzCustomFilter]="i === 5 || i === 6"
+        [nzFilterFn]="i !== 6 ? column.filterFn : undefined"
+        [nzFilterMultiple]="i !== 6 ? column.filterMultiple : undefined"
+        [nzFilters]="i !== 6 ? column.listOfFilter : undefined"
+        [nzSortDirections]="column.sortDirections"
+        [nzSortFn]="column.sortFn"
+        [nzSortOrder]="column.sortOrder"
+      >
+        {{ column.name }}
+
+        <nz-filter-trigger
+          *ngIf="i === 5"
+          [(nzVisible)]="visible"
+          [nzActive]="searchValue > 0"
+          [nzDropdownMenu]="menu"
+        >
+          <i nz-icon nzType="search"></i>
+        </nz-filter-trigger>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of filterTable.data; trackBy: identify">
+      <td>{{ formatDate(data.date) | date: "yy-MM-dd H:mm:ss" }}</td>
+      <td [class]="data.type">{{ data.type }}</td>
+      <td>{{ data.priceUSD | currency: "USD":"symbol":"1.4-7" }}</td>
+      <td>{{ data.priceETH | number: "1.8-8" }}</td>
+      <td>{{ data.amountToken | number: "1.2-8" }}</td>
+      <td>{{ data.amountEth | number: "1.2-8" }}</td>
+      <td nzEllipsis>
+        <i
+          *ngIf="data.makerId && data.makerId.length === 42"
+          [nzType]="searchMaker !== '' ? 'close' : 'search'"
+          (click)="searchThisMaker(data.makerId)"
+          nz-icon
+        ></i>&nbsp;
+        <a
+          *ngIf="data.makerId && data.makerId.length === 42"
+          (click)="openMyZerion(data.makerId)"
+          class="zerion"
+          target="_blank"
+        >
+          <img
+            class="light"
+            src="/assets/images/zerion.png"
+            alt="Zerion link"
+            width="16"
+            height="16"
+          />
+        </a>
+        <a
+          [href]="'https://etherscan.io/address/' + data.makerId"
+          class="maker-address"
+          target="_blank"
+        >
+          {{ data.makerId }}
+        </a>
+      </td>
+      <td>
+        <a [href]="'https://etherscan.io/tx/' + data.txId" target="_blank">
+          Tx
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</nz-table>
+
+<nz-dropdown-menu #menu="nzDropdownMenu">
+  <div class="ant-table-filter-dropdown">
+    <div class="search-box">
+      <input
+        [(ngModel)]="searchMaker"
+        type="text"
+        nz-input
+        placeholder="Search address"
+      />
+      <button
+        (click)="searchMakerFn()"
+        class="search-button"
+        nz-button
+        nzSize="small"
+        nzType="primary"
+      >
+        Search
+      </button>
+      <button
+        (click)="resetMakerSearch()"
+        nz-button
+        nzSize="small"
+      >
+        Reset
+      </button>
+    </div>
+  </div>
+</nz-dropdown-menu>
+
+<nz-drawer
+  *ngIf="this.token && uniswapDrawerVisible"
+  [nzClosable]="false"
+  [nzVisible]="uniswapDrawerVisible2"
+  [nzTitle]="uniTitle"
+  [nzWidth]="'600px'"
+  nzPlacement="right"
+  (nzOnClose)="close()"
+>
+  <ng-container *ngIf="direction === 'buy'">
+    <iframe
+      [id]="token.id"
+      [src]="getUniUrlBuy()"
+      height="660px"
+      style="
+        border: 0;
+        margin: 0 auto;
+        display: block;
+        border-radius: 10px;
+        max-width: 600px;
+        min-width: 300px;
+      "
+      width="100%"
+    ></iframe>
+  </ng-container>
+  <ng-container *ngIf="direction === 'sell'">
+    <iframe
+      [id]="token.id"
+      [src]="getUniUrlSell()"
+      height="660px"
+      style="
+        border: 0;
+        margin: 0 auto;
+        display: block;
+        border-radius: 10px;
+        max-width: 600px;
+        min-width: 300px;
+      "
+      width="100%"
+    ></iframe>
+  </ng-container>
+  <nz-divider></nz-divider>
+  <button
+    *ngIf="etherService.connectedAddress"
+    nz-button
+    nzType="primary"
+    (click)="openMyTradesDrawer()"
+  >
+    My Trades
+  </button>
+</nz-drawer>
+
+<nz-drawer
+  *ngIf="myTradesDrawerVisible"
+  [nzHeight]="600"
+  [nzPlacement]="'bottom'"
+  [nzVisible]="myTradesDrawerVisible2"
+  [nzZIndex]="9999"
+  nzTitle="My Trades (from AstroTools connected wallet)"
+  (nzOnClose)="closeMyTradesDrawer()"
+>
+  <app-address-trades
+    *ngIf="token"
+    [address]="etherService.account"
+    [symbol]="token.symbol"
+  ></app-address-trades>
+</nz-drawer>
+
+<ng-template #uniTitle>
+  <span style="font-size: 11px">
+    This panel is sourced from Uniswap and trades are NOT facilitated by AstroTools |
+    <a *ngIf="direction === 'buy'" [href]="getUniUrlBuy()" target="_blank">Go to Uniswap</a>
+    <a *ngIf="direction === 'sell'" [href]="getUniUrlSell()" target="_blank">Go to Uniswap</a>
+  </span>
+</ng-template>
+
+<!-- <nz-dropdown-menu #menu="nzDropdownMenu">
+  <div class="ant-table-filter-dropdown">
+    <div class="search-box">
+      <input
+        type="text"
+        [(ngModel)]="searchValue"
+        nz-input
+        placeholder="Search name"
+      />
+      <button
+        class="search-button"
+        nz-button
+        nzSize="small"
+        nzType="primary"
+        (click)="search()"
+      >
+        Search
+      </button>
+      <button nz-button nzSize="small" (click)="reset()">Reset</button>
+    </div>
+  </div>
+</nz-dropdown-menu> -->

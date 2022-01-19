@@ -1,0 +1,74 @@
+:host {
+  min-width: 265px;
+}
+
+p {
+  margin-bottom: 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.priceUSD {
+  margin-bottom: 0;
+  font-weight: 500;
+  font-size: 1.3em;
+}
+
+.priceETH {
+  margin-bottom: 0.5em;
+}
+
+div {
+  &.symbol {
+    display: flex;
+    flex-direction: column;
+    align-items: baseline;
+    font-weight: 500;
+    font-size: 1.4em;
+
+    .etherscan,
+    .coingecko,
+    .logo,
+    .name {
+      margin-right: 0.2em;
+    }
+
+    .title-header {
+      display: flex;
+      align-items: center;
+    }
+
+    .icons-list {
+      img {
+        vertical-align: baseline;
+      }
+    }
+  }
+}
+
+a {
+  &.trade {
+    margin-right: 0.5em;
+  }
+
+  &.mobile-trade,
+  &.favorite2 {
+    display: none;
+  }
+}
+
+.buy-btn {
+  margin-right: 0.6em;
+  background-color: #29a767;
+  background-color: rgb(2, 192, 118);
+  border: 1px solid rgb(2, 192, 118);
+  text-transform: uppercase;
+  color: white;
+}
+
+.buy-btn:focus,
+.buy-btn:hover {
+  color: rgb(255, 254, 251);
+  background-color: #409572;
+  border-color: #409572;
+}

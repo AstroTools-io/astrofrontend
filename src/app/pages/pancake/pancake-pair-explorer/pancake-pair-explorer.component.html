@@ -1,0 +1,156 @@
+<!-- <nz-alert
+  nzType="warning"
+  nzCloseable
+  nzMessage="The PancakeSwap API is currently delayed in syncing to Binance Smart Chain. Please trade with caution."
+>
+</nz-alert> -->
+
+<section id="header" [style.display]="'flex'">
+  <app-token-info
+    *ngIf="pairInfo && pairInfo.id"
+    [dailyVolume]="dailyVolume"
+    [ethPrice]="ethPrice"
+    [geckoInfo]="geckoInfo"
+    [pairInfo]="pairInfo"
+  ></app-token-info>
+
+  <div id="chart-right">
+    <!--<div id="chart-header">
+      <section class="chart-options">
+        <nz-select
+          class="time-interval"
+          [(ngModel)]="timeInterval"
+          (ngModelChange)="timeChanged()"
+        >
+          <nz-option [nzValue]="1" nzLabel="1m"></nz-option>
+          <nz-option [nzValue]="3" nzLabel="3m"></nz-option>
+          <nz-option [nzValue]="5" nzLabel="5m"></nz-option>
+          <nz-option [nzValue]="10" nzLabel="10m"></nz-option>
+          <nz-option [nzValue]="15" nzLabel="15m"></nz-option>
+          <nz-option [nzValue]="30" nzLabel="30m"></nz-option>
+          <nz-option [nzValue]="60" nzLabel="1h"></nz-option>
+          <nz-option [nzValue]="240" nzLabel="4h"></nz-option>
+          <nz-option [nzValue]="720" nzLabel="12h"></nz-option>
+        </nz-select>
+        <a
+          nz-button
+          nzType="primary"
+          [nzLoading]="fetchMoreIsLoading"
+          (click)="fetchMoreQuery()"
+        >
+          More Candles
+        </a>
+      </section>
+      <section class="price-options" *ngIf="currentFav">
+        <div class="my-entry">
+          <label>My Entry: </label>
+          <input
+            nz-input
+            placeholder="price"
+            [(ngModel)]="currentFav.myEntry"
+          />
+          <a nz-button nzType="primary" (click)="saveMyEntry()">Set My Entry</a>
+        </div>
+        <div class="price-alert">
+          <label>Price Alert: </label>
+          <input
+            nz-input
+            placeholder="Price alert"
+            [value]="currentFav.priceUSD ? currentFav.priceUSD.toFixed(6) : 0"
+            #pAlert
+          />
+          <a nz-button nzType="primary" (click)="savePriceAlert(pAlert.value)">
+            Save
+          </a>
+          <div class="alerts">
+            <span *ngIf="currentFav.higherSavedPrice">
+              <label>Alert >= </label>${{ currentFav.higherSavedPrice }}
+            </span>
+            <span *ngIf="currentFav.lowerSavedPrice">
+              <label> Alert <= </label>${{ currentFav.lowerSavedPrice }}
+            </span>
+          </div>
+        </div>
+      </section>
+    </div> -->
+    <app-tv-chart
+      *ngIf="isInitiated"
+      [datafeed]="datafeed"
+      [interval]="'15'"
+    ></app-tv-chart>
+  </div>
+</section>
+<!-- <button nz-button nzType="primary" class="trade-history">Trade History</button> -->
+
+<nz-table
+  *ngIf="listOfColumns && listOfColumns.length"
+  #filterTable
+  [nzData]="listOfDisplayData"
+  [nzLoading]="!listOfDisplayData || listOfDisplayData.length === 0"
+  [nzPageSize]="50"
+  nzSize="small"
+  nzTableLayout="auto"
+>
+  <thead>
+    <tr>
+      <th
+        *ngFor="let column of listOfColumns; let i = index;"
+        [nzCustomFilter]="i === 4"
+        [nzFilterFn]="column.filterFn"
+        [nzFilterMultiple]="column.filterMultiple"
+        [nzFilters]="column.listOfFilter"
+        [nzSortDirections]="column.sortDirections"
+        [nzSortFn]="column.sortFn"
+        [nzSortOrder]="column.sortOrder"
+      >
+        {{ column.name }}
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of filterTable.data; trackBy: identify">
+      <td>{{ data.date | date: "yy-MM-dd H:mm:ss" }}</td>
+      <td [class]="data.type">{{ data.type }}</td>
+      <td>{{ data.priceUSD | currency: "USD":"symbol":"1.2-8" }}</td>
+      <!-- <td>{{ data.priceETH | number: "1.2-8" }}</td> -->
+      <td>{{ data.amountToken | number: "1.2-4" }}</td>
+      <td>{{ data.amountEth | number: "1.2-2" }}</td>
+      <td>{{ data.amountInUsd | number: "1.2-2" }}</td>
+      <td nzEllipsis>
+        <a
+          [href]="'https://bscscan.com/address/' + data.makerId"
+          target="_blank"
+        >
+          {{ data.makerId }}
+        </a>
+      </td>
+      <td>
+        <a [href]="'https://bscscan.com/tx/' + data.txId" target="_blank">
+          Tx
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</nz-table>
+<!-- <nz-dropdown-menu #menu="nzDropdownMenu">
+  <div class="ant-table-filter-dropdown">
+    <div class="search-box">
+      <input
+        type="text"
+        [(ngModel)]="searchValue"
+        nz-input
+        placeholder="Search name"
+      />
+      <button
+        class="search-button"
+        nz-button
+        nzSize="small"
+        nzType="primary"
+        (click)="search()"
+      >
+        Search
+      </button>
+      <button nz-button nzSize="small" (click)="reset()">Reset</button>
+    </div>
+  </div>
+</nz-dropdown-menu> -->

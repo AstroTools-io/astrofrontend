@@ -1,0 +1,40 @@
+<nz-table
+  #filterTable
+  [nzData]="accountInfo$ | async"
+  [nzPageSize]="10"
+  nzSize="small"
+  nzTableLayout="auto"
+>
+  <thead>
+    <tr>
+      <th
+        *ngFor="let column of listOfColumns"
+        [nzFilterFn]="column.filterFn"
+        [nzFilterMultiple]="column.filterMultiple"
+        [nzFilters]="column.listOfFilter"
+        [nzSortDirections]="column.sortDirections"
+        [nzSortFn]="column.sortFn"
+        [nzSortOrder]="column.sortOrder"
+      >
+        {{ column.name }}
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of filterTable.data; trackBy: identify">
+      <td>{{ formatDate(data.timeStamp) | date: "yy-MM-dd H:mm:ss" }}</td>
+      <td>
+        <nz-tag [nzColor]="getSwapType(data) === 'in' ? 'green' : 'red'">
+          {{ getSwapType(data) }}
+        </nz-tag>
+      </td>
+      <td>{{ data.tokenSymbol }} ({{ data.tokenName }})</td>
+      <td>{{ getTokenAmount(data) | number: "1.0-2" }}</td>
+      <td>
+        <a [href]="'https://etherscan.io/tx/' + data.hash" target="_blank">
+          Tx
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</nz-table>

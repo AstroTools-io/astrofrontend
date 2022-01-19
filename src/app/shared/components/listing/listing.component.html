@@ -1,0 +1,145 @@
+<nz-table
+  #filterTable
+  [nzData]="currentPairs$ | async"
+  [nzPageSize]="50"
+  nzSize="small"
+  nzTableLayout="auto"
+>
+  <thead>
+  <tr>
+    <th
+      *ngFor="let column of listOfColumns; let i = index;"
+      [nzCustomFilter]="i >= 5"
+      [nzFilterFn]="column.filterFn"
+      [nzFilterMultiple]="column.filterMultiple"
+      [nzFilters]="column.listOfFilter"
+      [nzSortDirections]="column.sortDirections"
+      [nzSortFn]="column.sortFn"
+      [nzSortOrder]="column.sortOrder"
+    >
+      {{ column.name }}
+    </th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr
+    *ngFor="let data of filterTable.data; trackBy: identify"
+    [class]="+data.currentInfos.currentPoolEth > 0.1 ? '' : 'rugged'"
+    [id]="data.currentInfos.currentPoolEth"
+  >
+    <td>{{ formatDate(data.createdAtTimestamp) | amTimeAgo }}</td>
+    <td>
+      <a
+        [routerLink]="(!isPancake ? '/' : '/pancake-') + 'pair-explorer/' + data.idPair"
+        class="actions"
+        target="_blank"
+      >
+        {{ data.tokenName }}
+      </a>
+    </td>
+    <td>
+      {{ data.initialInfos.initialPriceUSD | number: "1.0-8" }}
+      <br />
+      {{ data.currentInfos.currentPriceUSD | number: "1.0-8" }}
+    </td>
+    <!-- <td>
+      {{ data.InitialPoolToken | number: "1.0-0" }} {{ data.NameToken }}
+      <br />
+      {{ data.CurrentPoolToken | number: "1.0-0" }} {{ data.NameToken }}
+    </td> -->
+    <td>
+      {{ data.initialInfos.initialPoolEth | number: "1.0-2" }} ETH
+      <br />
+      {{ data.currentInfos.currentPoolEth | number: "1.0-2" }} ETH
+    </td>
+    <td>
+      ${{ data.initialInfos.initialMarketCap | number: "1.0-0" }}
+      <br />
+      ${{ data.currentInfos.currentMarketCap | number: "1.0-0" }}
+    </td>
+    <td>{{ data.txCount }}</td>
+    <td>
+      <nz-tag [nzColor]="getPriceChange(data) > 0 ? 'green' : 'red'">
+        {{ getPriceChange(data) | number: "1.0-2" }} %
+      </nz-tag>
+    </td>
+    <td *ngIf="!isPancake">
+      {{ data.holderCountOld ? data.holderCountOld + " → " : "" }}
+      {{ data.holderCount }}
+    </td>
+    <td>
+      <a
+        [routerLink]="(!isPancake ? '/' : '/pancake-') + 'pair-explorer/' + data.idPair"
+        class="trade"
+        nz-button
+        nzType="primary"
+        target="_blank"
+      >
+        Trade
+      </a>
+      <a
+        *ngIf="!isPancake"
+        [href]="'https://app.uniswap.org/#/swap?outputCurrency=' + data.idToken"
+        class="actions"
+        target="_blank"
+      >
+        <img
+          alt="uniswap link"
+          height="30"
+          nz-tooltip
+          nzTooltipTitle="Trade this token on UniSwap - ensure URL is https://app.uniswap.org/"
+          src="/assets/images/uniswap.png"
+          width="30"
+        />
+      </a>
+      <a
+        [href]="'https://unicrypt.network/amm/' + (!isPancake ? 'uni' : 'pancake') + '/token/' + data.idToken"
+        class="actions"
+        target="_blank"
+      >
+        <img
+          alt="unicrypt link"
+          height="20"
+          nz-tooltip
+          nzTooltipTitle="Unicrypt: Locked initial liquidity reduces chances of rug pulls or exit scams"
+          src="/assets/images/unicrypt.svg"
+          width="20"
+        />
+      </a>
+    </td>
+    <td>
+      <a
+        [href]="'https://' + (!isPancake ? 'etherscan.io' : 'bscscan.com') + '/token/' + data.idToken"
+        [nzTooltipTitle]="
+          data.contractVerified
+            ? 'Verified contract: Ensures deployed contract code matches source code, but does not rule out scams'
+            : 'Bytecode contract: Uncompiled code increases risk of scams, including prevention of selling'
+        "
+        nz-tooltip
+        target="_blank"
+      >
+        <img
+          [src]="
+            data.contractVerified
+              ? '/assets/images/verified.jpg'
+              : '/assets/images/not-verified.png'
+          "
+          alt="Contract verification"
+          height="20"
+          width="20"
+        />
+      </a>
+      <img
+        *ngIf="data.isCodeGenerator"
+        alt="Contract is from code generator"
+        class="actions"
+        height="20"
+        nz-tooltip
+        nzTooltipTitle="Code generator: Used a turnkey token creation tool with likely little to no actual function"
+        src="/assets/images/warning.png"
+        width="20"
+      />
+    </td>
+  </tr>
+  </tbody>
+</nz-table>
